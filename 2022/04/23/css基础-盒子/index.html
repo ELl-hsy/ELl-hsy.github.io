@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="ELl">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="ELl">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta name="description" content="笔记-css基础-盒子文档流 normal flow文档流  文档流是可以显示的对象在排列时所占用的位置; 文档流所在的位置是网页的最底层; 网页是一个多层的结构，一层叠加着一层; 通过css可以分别为每一层设置样式; 作为用户来讲只能看到最顶上一层; 这些层中，最底下的一层称之为文档流，文档流是网页的基础; 我们所创建的元素默认都是在文档流中进行排列的; 对于我们来说元素主要有两个状态;  ​">
+<meta property="og:type" content="article">
+<meta property="og:title" content="css基础-盒子">
+<meta property="og:url" content="https://ell-hsy.github.io/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="笔记-css基础-盒子文档流 normal flow文档流  文档流是可以显示的对象在排列时所占用的位置; 文档流所在的位置是网页的最底层; 网页是一个多层的结构，一层叠加着一层; 通过css可以分别为每一层设置样式; 作为用户来讲只能看到最顶上一层; 这些层中，最底下的一层称之为文档流，文档流是网页的基础; 我们所创建的元素默认都是在文档流中进行排列的; 对于我们来说元素主要有两个状态;  ​">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-04-23T14:21:38.805Z">
+<meta property="article:modified_time" content="2022-04-23T14:24:21.764Z">
+<meta property="article:author" content="ELl">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/bitbug_favicon.ico">
+    
+    <title>css基础-盒子 · ELl-hsy</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>ELl-hsy</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">ELl-hsy</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">css基础-盒子</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://c.wallhere.com/photos/75/78/digital_art_fantasy_art_environment_landscape_clouds_ocean_view_Z_4_zero-2079165.jpg!d)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                css基础-盒子
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">2.8k</span>阅读时长: <span class="post-count reading-time">10 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/04/23</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="笔记-css基础-盒子"><a href="#笔记-css基础-盒子" class="headerlink" title="笔记-css基础-盒子"></a>笔记-css基础-盒子</h1><h1 id=""><a href="#" class="headerlink" title=""></a></h1><h2 id="文档流-normal-flow"><a href="#文档流-normal-flow" class="headerlink" title="文档流 normal flow"></a>文档流 normal flow</h2><p><strong>文档流</strong></p>
+<ol>
+<li>文档流是可以显示的对象在排列时所占用的位置;</li>
+<li>文档流所在的位置是网页的最底层;</li>
+<li>网页是一个多层的结构，一层叠加着一层;</li>
+<li>通过css可以分别为每一层设置样式;</li>
+<li>作为用户来讲只能看到最顶上一层;</li>
+<li>这些层中，最底下的一层称之为<strong>文档流</strong>，文档流是网页的基础;</li>
+<li>我们所创建的元素默认都是在文档流中进行排列的;</li>
+<li>对于我们来说元素主要有两个状态;</li>
+</ol>
+<p>​	在文档流中(占位)</p>
+<p>​	不在文档流中(脱离文档流不占位)</p>
+<p><strong>元素在文档流中有什么特点：</strong></p>
+<p><strong>块元素:</strong></p>
+<ul>
+<li>块元素会在页面中独占一行(自上而下垂直排列);</li>
+<li>默认宽度是父元素的全部(会把父元素撑满);</li>
+<li>默认高度是被内容撑开(子元素);</li>
+</ul>
+<p><strong>行内元素:</strong></p>
+<ul>
+<li>行内元素不会独占页面的一行，只占自身的大小;</li>
+<li>行内元素在页面中从左向右水平排列，如果一行之中不能纳所有行内元素，则元素会换到第二行继续从左向右;</li>
+<li>水平排列(与书写习惯一致);</li>
+<li>行内元素的默认宽度与高度都是被内容撑开;</li>
+</ul>
+<h2 id="盒子模型-box-model"><a href="#盒子模型-box-model" class="headerlink" title="盒子模型 box model"></a>盒子模型 box model</h2><p><strong>上　top，右 right，下　bottom ，左  left</strong></p>
+<p><strong>盒子模型,盒子:</strong></p>
+<ol>
+<li>css将页面中的所有元素都设置为了一个矩形的盒子块</li>
+<li>将元素设置为矩形的盒子后，对页面的布局就变成将不同的盒子摆放到不同的位置</li>
+<li>每一个盒子都由以下几个部分组成：</li>
+</ol>
+<ul>
+<li>内容区(content)</li>
+<li>内边距(padding)</li>
+<li>边框(border)</li>
+<li>外边距(margin)</li>
+</ul>
+<p>基本上都是 border-top:</p>
+<p>​	top可以更换为其他的的;</p>
+<h3 id="１-内容区-content"><a href="#１-内容区-content" class="headerlink" title="１.内容区 content"></a>１.内容区 content</h3><ol>
+<li><p>内容区(content)，元素中的所有子元素和文本内容都在内容区排列</p>
+</li>
+<li><p>内容区的大小是由<strong>width</strong> 和 <strong>height</strong>两个属性来设置</p>
+<p>width 设置内容区的宽度;</p>
+<p>height 设置内容区的高度;</p>
+</li>
+</ol>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">width</span>: <span class="number">200px</span>;</span><br><span class="line"><span class="attribute">height</span>: <span class="number">200px</span>;</span><br><span class="line"><span class="attribute">background-color</span>: royalblue;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-盒子-边框-border"><a href="#2-盒子-边框-border" class="headerlink" title="2.盒子-边框 border"></a>2.盒子-边框 border</h3><p>边框(border)，边框属于盒子的边缘，边框里面属于盒子的内部，出了盒子都是外部</p>
+<p>边框的大小会影响到整个盒子的大小</p>
+<p>要设置边框，至少需要三个样式</p>
+<ul>
+<li><p><strong>边框的宽度</strong> <strong>border-width</strong></p>
+</li>
+<li><p><strong>边框的颜色</strong> <strong>border-color</strong></p>
+</li>
+<li><p><strong>边框的样式</strong> <strong>border-style</strong></p>
+<p><strong>属性可设置为  实线，虚线，双实线</strong></p>
+</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">border-width</span>: <span class="number">8px</span>;</span><br><span class="line"><span class="attribute">border-color</span>: black;</span><br><span class="line"><span class="attribute">border-style</span>: solid;</span><br></pre></td></tr></table></figure>
+
+<p><strong>用边框 border 指定样式</strong></p>
+<p>border是简写属性，可以通过该属性设置边框所有的相关样式并且没有顺序</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">border</span>：red solid <span class="number">10px</span>；</span><br></pre></td></tr></table></figure>
+
+<p><strong>用方向指定样式</strong><br><strong>方法一：</strong></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 指定上面位置的边框宽度 */</span></span><br><span class="line"><span class="attribute">border-top-width</span>: <span class="number">10px</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 指定xxx位置的边框颜色 */</span></span><br><span class="line"><span class="attribute">border</span>-xxx-<span class="attribute">color</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 指定xxx位置的边框线 */</span></span><br><span class="line"><span class="attribute">border</span>-xxx-style</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法二：</strong></p>
+<p>border-top   指单独定上面位置的颜色，宽度与边框线;<br>设置的内容可以随意摆放<br>可以是top 也可以是 right</p>
+<p>边框的宽度 border-width<br>    默认值，一般情况下为 3px（像素）<br>border-width 可以用来指定四个方向（上右下左）的宽度<br>值的情况：<br>例：border-width:10px 12px 18px 20px;<br>    四个值时 上 右 下 左 的顺序指定<br>    三个值时 上 左右 下  的顺序指定，以中间的数值指定左右两侧<br>    两个值时 上下 左右 的顺序指定<br>    一个值时 上下左右 就是指定了所有</p>
+<p>边框的颜色 border-color<br>    默认值为黑色，也可以入宽度一边一个颜色，顺序都是一样</p>
+<p>注意事项：<br>边框的宽度，边框的颜色 可以简写，最好不要简写<br>边框的样式 不能简写，因为不写就没了，它的默认值为none(没有边框) </p>
+<h3 id="3-盒子-内边距-padding"><a href="#3-盒子-内边距-padding" class="headerlink" title="3.盒子-内边距 padding"></a>3.盒子-内边距 padding</h3><ol>
+<li><p>**内边距(padding)**，与边框一样可以影响盒子大小，盒子的背景颜色会延申到内边距上；</p>
+</li>
+<li><p><strong>同由上 top，右right，下bottom，左 left来影响</strong></p>
+</li>
+<li><p>内边距不能设置颜色</p>
+</li>
+<li><p>padding的简写与边框一样四个方向：</p>
+</li>
+<li><p>其他格式相同:</p>
+<p>padding: 可以用来指定四个方向（上右下左）的宽度</p>
+</li>
+<li><p>值的情况：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">padding</span>:<span class="number">10px</span> <span class="number">12px</span> <span class="number">18px</span> <span class="number">20px</span>;</span><br></pre></td></tr></table></figure>
+
+<p>四个值时 上 右 下 左 的顺序指定;</p>
+<p>三个值时 <strong>上</strong> <strong>左右</strong> <strong>下</strong>  的顺序指定，以中间的数值指定左右两侧;</p>
+<p>两个值时 <strong>上下</strong> <strong>左右</strong> 的顺序指定;</p>
+<p>一个值时 <strong>上下左右</strong> 就是指定了所有;</p>
+</li>
+<li><p>计算盒子大小需要将 <strong>内容区，内边距与边框</strong>相加计算;</p>
+</li>
+</ol>
+<h3 id="4-盒子-外边距-margin"><a href="#4-盒子-外边距-margin" class="headerlink" title="4.盒子-外边距 margin"></a>4.盒子-外边距 margin</h3><p><strong>外边距(margin)</strong></p>
+<ol>
+<li><p>外边距不会影响可见框的大小,但是外边距会影响盒子的位置;</p>
+<p><strong>margin-top</strong></p>
+</li>
+<li><p>上外边距，设置一个正值，元素会向下移动</p>
+<p><strong>margin-right</strong></p>
+</li>
+<li><p>默认情况下设置右外边距不会产生任何效果</p>
+<p><strong>margin-bottom</strong></p>
+</li>
+<li><p>下外边距，设置一个正值，其下面的元素都会向下移动</p>
+<p><strong>margin-left</strong></p>
+</li>
+<li><p>左外边距，设置一个正值，元素会向右移动</p>
+</li>
+<li><p><strong>margin也可以设置负值，元素会往相反的方向移动</strong></p>
+</li>
+<li><p>元素在页面中是按照自身自左向右的顺序排列的;</p>
+</li>
+<li><p>所以默认情况下，如果我们设置的左和上外边距则会移动自身,而设置下和右边距会移动其他元素;</p>
+</li>
+<li><p>外边距margin可以与边框，内边距它们一样简写</p>
+<p>margin:</p>
+</li>
+<li><p><strong>margin会影响到盒子实际占用的空间</strong></p>
+</li>
+</ol>
+<h3 id="5-盒子-水平方向布局"><a href="#5-盒子-水平方向布局" class="headerlink" title="5.盒子-水平方向布局"></a>5.盒子-水平方向布局</h3><p><strong>元素的水平方向布局：</strong></p>
+<p>元素在其父元素中水平方向的位置由以下几个属性共同决定</p>
+<p>​	margin-left    外边距-左</p>
+<p>​	border-left     边框-左</p>
+<p>​	padding-left   内边距-左</p>
+<p>​	width               宽度</p>
+<p>​	padding-right   内边距-右</p>
+<p>​	border-right      边框-右</p>
+<p>​	margin-right   外边距-右</p>
+<p><strong>一个元素在父元素中，水平布局必须满足以下等式：</strong></p>
+<p><strong>margin-left + border-left + padding-left + width + padding-right + border-right + margin-right &#x3D;</strong> <strong>父元素内容区的宽度</strong></p>
+<p><strong>外边距</strong>-<strong>左 + 边框-左 +</strong></p>
+<p><strong>内边距-左</strong> <strong>+</strong> <strong>宽度</strong> <strong>+</strong> </p>
+<p><strong>内边距-右</strong> <strong>+</strong> <strong>边框-右</strong> <strong>+</strong> </p>
+<p>**外边距-右 **&#x3D;<strong>父元素内容区的宽度</strong></p>
+<p>外边距-左 与 外边距-右 默认值为0，而宽度 width 的默认值就是 auto ，它们三可以设置为<strong>auto(自动)</strong>;</p>
+<p>以上等式必须满足，如果相加等式不成立，则称之为过度约束，则等式自动调整</p>
+<p><strong>调整情况：</strong></p>
+<ol>
+<li><p>如果七个值中没有为 auto 的情况，则浏览器会自动调整 margin-right 外边距-右的值以使等式满足</p>
+</li>
+<li><p>七个值中三个可以设置为auto：</p>
+<p>外边距-左 margin-left</p>
+<p>外边距-右 margin-right</p>
+<p>宽度 width</p>
+</li>
+<li><p>如果某个值为auto，则会自动调整为auto的那个值让等式成立</p>
+</li>
+<li><p>auto + 0 + 0 +200 + 0 + 0 + 0 &#x3D; 父元素内容区的宽度</p>
+</li>
+<li><p>如果将一个宽度和一个外边距设置为auto，则宽度会调整到最大，设置为auto的外边距会自动为0;</p>
+</li>
+<li><p>如果将三个值都设置为auto，则外边距都是0，宽度最大;</p>
+</li>
+<li><p>如果将两个外边距设置为auto，宽度值固定，则会将外边距设置为相同的值;</p>
+</li>
+<li><p>所以我们可以利用这一点来使一个元素在父元素中水平居中;</p>
+</li>
+</ol>
+<p>示例：</p>
+<p><strong>width: xxxpx；</strong></p>
+<p><strong>margin: 0 auto;</strong></p>
+<p>margin: 100px <em>auto</em>;</p>
+<h3 id="6-盒子-垂直方向布局"><a href="#6-盒子-垂直方向布局" class="headerlink" title="6.盒子-垂直方向布局"></a>6.盒子-垂直方向布局</h3><p>概括：</p>
+<ol>
+<li>垂直排列，设置多高是多高；</li>
+<li>子元素超过父元素的，可以用 overflow 裁掉；</li>
+<li>overflow 的值：</li>
+<li>visible 默认值，子元素溢出，在父元素外部显示;</li>
+<li>hidden 溢出的内容会被裁减不显示;</li>
+<li>scroll 根据设置的宽与高生成两个滚动条，通过滚动条查看完整的内容;</li>
+<li>auto 根据需要生成滚动条，需要上下的生成上下滚动条，需要左右的生成左右滚动条;</li>
+<li>子元素是在父元素的内容区中排列的，如果子元素超过父元素则会溢出;</li>
+</ol>
+<h3 id="7-盒子-外边距折叠"><a href="#7-盒子-外边距折叠" class="headerlink" title="7.盒子-外边距折叠"></a>7.盒子-外边距折叠</h3><p><strong>概括：</strong></p>
+<ol>
+<li><p>两个盒子在一上一下的位置时，上面盒子设置的下外边距与下面盒子设置的上外边距会发生重叠现象；</p>
+</li>
+<li><p><strong>在是兄弟元素的情况下：</strong></p>
+<ul>
+<li>兄弟元素间相邻的垂直外边距会取<strong>两者之间最大值（这是两者都是正值的情况下）</strong></li>
+<li>一正一负的情况：取两者的和</li>
+<li>都是负值的情况：取两者中的绝对值最大的（-200与-100，取-200）</li>
+<li>兄弟元素之间的外边距的重叠，队开发是有利的，不需要进行处理</li>
+</ul>
+</li>
+<li><p><strong>父子元素的情况下：</strong></p>
+<p>父子元素相邻外边距，子元素会传递给父元素（上外边距）;</p>
+<p>父子外边距的折叠会影响到页面的布局，必须进行处理;</p>
+<p><strong>解决方法</strong>:</p>
+</li>
+<li><p>给父元素设置border-top 或者 padding-top（分隔父子元素的margin-top）</p>
+</li>
+<li><p>给父元素设置overflow：hidden</p>
+</li>
+<li><p>转换成行内块元素</p>
+</li>
+<li><p>设置浮动</p>
+</li>
+</ol>
+<h3 id="8-盒子-塌陷-溢出"><a href="#8-盒子-塌陷-溢出" class="headerlink" title="8.盒子-塌陷,溢出"></a>8.盒子-塌陷,溢出</h3><p>盒子塌陷:当两个块级元素为父子关系时,给子元素设置外边距高时,父元素会出现塌陷;</p>
+<p><strong>方法一:</strong></p>
+<p>给父元素设置边框或者内边距</p>
+<p>不推荐使用,它们容易撑大盒子</p>
+<p><strong>方法二:</strong></p>
+<p>给父元素设置:</p>
+<p><strong>overflow: hidden;</strong> </p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 溢出隐藏 */</span></span><br><span class="line"><span class="attribute">overflow</span>: hidden; </span><br><span class="line"><span class="comment">/* 默认值,溢出可见 */</span></span><br><span class="line"><span class="attribute">overflow</span>: visibl; </span><br><span class="line"><span class="comment">/* 无论是否溢出,都显示滚条*/</span></span><br><span class="line"><span class="attribute">overflow</span>: hidden; </span><br><span class="line"><span class="comment">/* 根据是否溢出,自动显示或者隐藏滚动条 */</span></span><br><span class="line"><span class="attribute">overflow</span>: hidden; </span><br><span class="line"><span class="comment">/* 横向隐藏滚动条 */</span></span><br><span class="line"><span class="attribute">overflow-x</span>: hidden; </span><br></pre></td></tr></table></figure>
+
+<p>推荐使用;</p>
+<p><strong>方法三:</strong></p>
+<p>把父子元素,转换成为行内块</p>
+<p>不推荐使用</p>
+<p>**方法四:**设置浮动</p>
+<h3 id="9-盒子-自动内减"><a href="#9-盒子-自动内减" class="headerlink" title="9.盒子-自动内减"></a>9.盒子-自动内减</h3><p>需求：盒子尺寸300*300，背景粉色，边框10px实线黑色，上下左右20px的内边距，如何完成？<br>给盒子设置border或padding时，盒子会被撑大，如果不想盒子被撑大？</p>
+<p><strong>解决方法</strong> ① ：手动内减<br>    操作：自己计算多余大小，手动在内容中减去<br>    缺点：项目中计算量太大，很麻烦<br><strong>解决方法</strong> ② ：自动内减<br>操作：给盒子设置属性 box-sizing : border-box ; 即可<br>优点：浏览器会自动计算多余大小，自动在内容中减去</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 自动内减 */</span></span><br><span class="line"><span class="attribute">box-sizing</span> : border-box;</span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">自动内减</span></span><br><span class="line"><span class="comment">content-box 为 外加模式，用户设置的宽度和高度是相对稳定的，增加border、padding会使整个盒子变大</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>content-box(标准)</strong><br>padding和border不被包含在width和height内<br>元素的实际大小为宽高+border+padding，此为标准模式下的盒模型</p>
+<p><strong>border-box(怪异)</strong><br>padding和border被包含在定义的width和height中，元素实际的大小为你定义了多宽就是多宽<br>此属性为怪异模式下的盒模型</p>
+<h3 id="10-盒子-清除默认内外边距"><a href="#10-盒子-清除默认内外边距" class="headerlink" title="10.盒子-清除默认内外边距"></a>10.盒子-清除默认内外边距</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">body标签默认有margin：8px</span></span><br><span class="line"><span class="comment">p标签默认有上下的margin</span></span><br><span class="line"><span class="comment">ul标签默认由上下的margin和padding-left</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">*&#123;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://ell-hsy.github.io">ELl</a>
+            <p>原文链接：<a href="https://ell-hsy.github.io/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/">https://ell-hsy.github.io/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/</a>
+            <p>发表日期：<a href="https://ell-hsy.github.io/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/">April 23rd 2022, 10:21:38 pm</a>
+            <p>更新日期：<a href="https://ell-hsy.github.io/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/">April 23rd 2022, 10:24:21 pm</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2022/04/22/css%E5%9F%BA%E7%A1%80-%E6%96%87%E6%9C%AC%E6%A0%B7%E5%BC%8F/" title="css基础-文本样式">
+                    <div class="prevTitle">css基础-文本样式</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:113045106@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="https://github.com/ELl-hsy?tab=repositories" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%94%E8%AE%B0-css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90"><span class="toc-number">1.</span> <span class="toc-text">笔记-css基础-盒子</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text"></span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E6%A1%A3%E6%B5%81-normal-flow"><span class="toc-number">2.1.</span> <span class="toc-text">文档流 normal flow</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%92%E5%AD%90%E6%A8%A1%E5%9E%8B-box-model"><span class="toc-number">2.2.</span> <span class="toc-text">盒子模型 box model</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%EF%BC%91-%E5%86%85%E5%AE%B9%E5%8C%BA-content"><span class="toc-number">2.2.1.</span> <span class="toc-text">１.内容区 content</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%9B%92%E5%AD%90-%E8%BE%B9%E6%A1%86-border"><span class="toc-number">2.2.2.</span> <span class="toc-text">2.盒子-边框 border</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%9B%92%E5%AD%90-%E5%86%85%E8%BE%B9%E8%B7%9D-padding"><span class="toc-number">2.2.3.</span> <span class="toc-text">3.盒子-内边距 padding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E7%9B%92%E5%AD%90-%E5%A4%96%E8%BE%B9%E8%B7%9D-margin"><span class="toc-number">2.2.4.</span> <span class="toc-text">4.盒子-外边距 margin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%9B%92%E5%AD%90-%E6%B0%B4%E5%B9%B3%E6%96%B9%E5%90%91%E5%B8%83%E5%B1%80"><span class="toc-number">2.2.5.</span> <span class="toc-text">5.盒子-水平方向布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E7%9B%92%E5%AD%90-%E5%9E%82%E7%9B%B4%E6%96%B9%E5%90%91%E5%B8%83%E5%B1%80"><span class="toc-number">2.2.6.</span> <span class="toc-text">6.盒子-垂直方向布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E7%9B%92%E5%AD%90-%E5%A4%96%E8%BE%B9%E8%B7%9D%E6%8A%98%E5%8F%A0"><span class="toc-number">2.2.7.</span> <span class="toc-text">7.盒子-外边距折叠</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E7%9B%92%E5%AD%90-%E5%A1%8C%E9%99%B7-%E6%BA%A2%E5%87%BA"><span class="toc-number">2.2.8.</span> <span class="toc-text">8.盒子-塌陷,溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E7%9B%92%E5%AD%90-%E8%87%AA%E5%8A%A8%E5%86%85%E5%87%8F"><span class="toc-number">2.2.9.</span> <span class="toc-text">9.盒子-自动内减</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E7%9B%92%E5%AD%90-%E6%B8%85%E9%99%A4%E9%BB%98%E8%AE%A4%E5%86%85%E5%A4%96%E8%BE%B9%E8%B7%9D"><span class="toc-number">2.2.10.</span> <span class="toc-text">10.盒子-清除默认内外边距</span></a></li></ol></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 7
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/22</span>
+            <a class="archive-post-title" href="/2022/04/22/css%E5%9F%BA%E7%A1%80-%E6%96%87%E6%9C%AC%E6%A0%B7%E5%BC%8F/">css基础-文本样式</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/04/23/css%E5%9F%BA%E7%A1%80-%E7%9B%92%E5%AD%90/">css基础-盒子</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/04/21/css%E5%9F%BA%E7%A1%80-%E8%A7%84%E8%8C%83/">css基础-规范</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span>
+            <a class="archive-post-title" href="/2022/04/21/css%E5%9F%BA%E7%A1%80-%E9%80%89%E6%8B%A9%E5%99%A8/">css基础-选择器</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/04/21/html%E5%9F%BA%E7%A1%80-%E6%A0%87%E7%AD%BE/">html基础-标签</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/04/20/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/">来自前端小白的自述</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/04/20/html%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">html基础知识</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="日记/2022-04">
+            <span class="iconfont-archer">&#xe60a;</span>
+            日记/2022-04
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://ell-hsy.github.io",
+        root: siteMetaRoot,
+        author: "ELl"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>
